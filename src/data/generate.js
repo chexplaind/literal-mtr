@@ -3,65 +3,32 @@ const csv = require("csvtojson")
 const fs = require("fs")
 const mdbg = require("mdbg")
 
-readFile()
+processFile(csvFilePath)
 
-async function readFile() {
-  let jsonArray = await csv().fromFile(csvFilePath)
+async function processFile(path) {
+  let jsonArray = await csv().fromFile(path)
   for await (const station of jsonArray) {
     processStation(station)
-    console.log("After waiting")
   }
-  
 }
 
 function processStation(station) {
-  station.characters = [...station.chineseName]
+  let characters = [...station.chineseName]
   var cedictPromises = []
-  for (let i = 0; i < station.characters.length; i++) {
-    cedictPromises.push(
-      mdbg
-        .getByHanzi(station.characters[i])
-        .then(cedictObj => {
-          station.characters[i] = cedictObj
-          console.log(station)
-          writeToFile(station)
-        })
-        .catch(err => {
-          console.log(err)
-        })
-    )
+  for (let i = 0; i < characters.length; i++) {
+    cedictPromises.push(queryDict(characters[i]))
   }
-  return Promise.all(cedictPromises)
+  return Promise.all(cedictPromises).then(cedictResults => {
+    station.characters = cedictResults
+    // console.log(station)
+    writeToFile(station)
+  })
 }
 
-function queryDict(characters) {
-  var cedictPromises = []
-  var enrichedCharacters = []
-
-  for (let i = 0; i < characters.length; i++) {
-    cedictPromises.push(
-      mdbg
-        .getByHanzi(characters[i])
-        .then(cedictObj => {
-          console.log(cedictObj)
-          enrichedCharacters.push(cedictObj)
-        })
-        .catch(err => {
-          console.log(err)
-        })
-    )
-  }
-  console.log("dict queries: " + cedictPromises.length)
-
-  return Promise.all(cedictPromises)
-    .then(() => {
-      console.log("enriched chars: " + enrichedCharacters.length)
-      return enrichedCharacters
-    })
-    .catch(err => {
-      console.log(err)
-      return enrichedCharacters
-    })
+function queryDict(character) {
+  return mdbg.getByHanzi(character).catch(err => {
+    console.log(err)
+  })
 }
 
 function writeToFile(station) {
