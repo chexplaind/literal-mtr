@@ -103,3 +103,8 @@ Looking for more guidance? Full documentation for Gatsby lives [on the website](
 Gatsby Cloud is an end-to-end cloud platform specifically built for the Gatsby framework that combines a modern developer experience with an optimized, global edge network.
 
 <!-- AUTO-GENERATED-CONTENT:END -->
+
+## Attributions
+
+https://data.gov.hk/en-data/dataset/mtr-data-routes-fares-barrier-free-facilities
+https://www.mdbg.net/chinese/dictionary?page=cc-cedict
